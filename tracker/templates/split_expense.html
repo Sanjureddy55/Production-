@@ -186,6 +186,13 @@
         .btn-confirm-logout:hover {
             background: #bb2d3b;
         }
+        /* 🔥 EDIT FORM ANIMATION */
+        [id^="edit-form-"] {  
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.4s ease, opacity 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -257,7 +264,43 @@
 
         {% for item in expenses %}
         <div class="expense-card">
-            <h6 class="mb-1">{{ item.expense.title }}</h6>
+          <div class="d-flex justify-content-between align-items-center">
+    <h6 class="mb-1">{{ item.expense.title }}</h6>
+
+    <div class="d-flex gap-2">
+
+        <!-- EDIT -->
+        <button onclick="toggleEdit({{ item.expense.id }})"
+    style="
+        border:none;
+        background:#e0f2fe;
+        color:#0284c7;
+        padding:6px 10px;
+        border-radius:8px;
+        font-size:14px;
+    ">
+    <i class="bi bi-pencil"></i>
+</button>
+
+        <!-- DELETE -->
+        <form method="POST" action="{% url 'delete_expense' item.expense.id %}">
+            {% csrf_token %}
+            <button type="submit"
+                onclick="return confirm('Delete this expense?')"
+                style="
+                    border:none;
+                    background:#fee2e2;
+                    color:#dc3545;
+                    padding:6px 10px;
+                    border-radius:8px;
+                    font-size:14px;
+                ">
+                <i class="bi bi-trash"></i>
+            </button>
+        </form>
+
+    </div>
+</div>
             <div class="expense-meta">
                 Group: {{ item.expense.group.name }} |
                 Paid by: {{ item.expense.paid_by.name }}
@@ -267,7 +310,21 @@
                 Members: {{ item.member_count }} |
                 Per Person: ₹{{ item.per_person }}
             </div>
-        </div>
+        
+            <div id="edit-form-{{ item.expense.id }}" style="margin-top:10px;">
+
+                <form method="POST" action="{% url 'edit_expense' item.expense.id %}">
+                    {% csrf_token %}
+
+                    <input type="text" name="title" value="{{ item.expense.title }}" class="form-control mb-2">
+
+                    <input type="number" name="amount" value="{{ item.expense.total_amount }}" class="form-control mb-2">
+
+                    <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                </form>
+
+            </div>
+       
         {% empty %}
         <div class="text-muted">No split expenses yet</div>
         {% endfor %}
@@ -333,6 +390,22 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+function toggleEdit(id) {
+    let form = document.getElementById("edit-form-" + id);
+
+    if (!form) return;
+
+    if (form.style.maxHeight && form.style.maxHeight !== "0px") {
+        form.style.maxHeight = "0px";
+        form.style.opacity = "0";
+    } else {
+        form.style.maxHeight = form.scrollHeight + "px";
+        form.style.opacity = "1";
+    }
+}
+</script>
 
 </body>
 </html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Expense</title>
+</head>
+<body>
+
+<h2>Edit Expense</h2>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <label>Title</label><br>
+    <input type="text" name="title" value="{{ expense.title }}"><br><br>
+
+    <label>Amount</label><br>
+    <input type="number" name="amount" value="{{ expense.total_amount }}"><br><br>
+
+    <button type="submit">Save Changes</button>
+</form>
+
+</body>
+</html>

@@ -20,4 +20,6 @@ urlpatterns = [
 
     path('split-expense/', views.split_expense, name='split_expense'),
     path('settlements/', views.settlements, name='settlements'),
+    path('delete-expense/<int:expense_id>/', views.delete_expense, name='delete_expense'),
+    path('edit-expense/<int:expense_id>/', views.edit_expense, name='edit_expense'),
 ]

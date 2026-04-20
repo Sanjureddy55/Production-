@@ -279,3 +279,19 @@ def group_members_api(request, group_id):
     group = get_object_or_404(Group, id=group_id, user=request.user)
     members = Friend.objects.filter(groupmember__group=group).distinct().values('id', 'name')
     return JsonResponse(list(members), safe=False)
+@login_required
+def delete_expense(request, expense_id):
+    expense = get_object_or_404(SplitExpense, id=expense_id, group__user=request.user)
+    expense.delete()
+    return redirect('split_expense')
+@login_required
+def edit_expense(request, expense_id):
+    expense = get_object_or_404(SplitExpense, id=expense_id, group__user=request.user)
+
+    if request.method == 'POST':
+        expense.title = request.POST.get('title')
+        expense.total_amount = request.POST.get('amount')
+        expense.save()
+        return redirect('split_expense')
+
+    return render(request, 'edit_expense.html', {'expense': expense})
