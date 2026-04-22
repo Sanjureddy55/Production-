@@ -296,3 +296,51 @@ def edit_expense(request, expense_id):
         return redirect('split_expense')
 
     return render(request, 'edit_expense.html', {'expense': expense})
+import random
+from django.conf import settings
+from twilio.rest import Client
+
+otp_storage = {}
+
+def send_otp(request):
+    if request.method == "POST":
+        phone = request.POST.get("phone")
+
+        # generate OTP
+        otp = str(random.randint(100000, 999999))
+        otp_storage[phone] = otp
+
+        # send SMS using Twilio
+        client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+
+        client.messages.create(
+            body=f"Your OTP is {otp}",
+            from_=settings.TWILIO_PHONE_NUMBER,
+            to=phone
+        )
+
+        return render(request, "verify.html", {"phone": phone})
+
+    return render(request, "send_otp.html")
+
+
+def verify_otp(request):
+    if request.method == "POST":
+        phone = request.POST.get("phone")
+        entered_otp = request.POST.get("otp")
+
+        if otp_storage.get(phone) == entered_otp:
+            from django.shortcuts import redirect
+            from django.contrib.auth.models import User
+            from django.contrib.auth import login
+
+            user, created = User.objects.get_or_create(username=phone)
+            login(request, user)
+
+            return redirect('dashboard')
+
+        else:   # 👈 SAME LEVEL as if
+            return render(request, "verify.html", {
+                "phone": phone,
+                "error": "Invalid OTP"
+            })

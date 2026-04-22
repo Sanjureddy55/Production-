@@ -22,4 +22,6 @@ urlpatterns = [
     path('settlements/', views.settlements, name='settlements'),
     path('delete-expense/<int:expense_id>/', views.delete_expense, name='delete_expense'),
     path('edit-expense/<int:expense_id>/', views.edit_expense, name='edit_expense'),
+    path('send-otp/', views.send_otp, name='send_otp'),
+    path('verify-otp/', views.verify_otp, name='verify_otp'),
 ]
